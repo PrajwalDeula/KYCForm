@@ -10,7 +10,6 @@ class KYCForm(forms.ModelForm):
         fields = '__all__'
         ordering = ['-created_date']
         widgets = {
-        
             'dob_bs': NepaliDateInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'YYYY-MM-DD (B.S.)',
@@ -26,7 +25,19 @@ class KYCForm(forms.ModelForm):
             'address': forms.TextInput(attrs={'class': 'form-control'}),
             'birth_place':forms.TextInput(attrs={'class': 'form-control'}),
             'address_nepali': forms.TextInput(attrs={'class': 'form-control'}),
-            
+            'risk_category': forms.Select(attrs={'class': 'form-select'}),
+            'document_issued_date_bs': NepaliDateInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'YYYY-MM-DD (B.S.)'
+            }),
+            'document_issued_date_bs': NepaliDateInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'YYYY-MM-DD (B.S.)'
+            }),
+            'document_issued_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
             'qualification': forms.Select(attrs={'class': 'form-select'}),
              'profession': forms.Select(attrs={'class': 'form-select'}),
             'father_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -45,6 +56,10 @@ class KYCForm(forms.ModelForm):
             'age_proof_doc': forms.Select(attrs={'class': 'form-select'}),
             'document_number': forms.TextInput(attrs={'class': 'form-control'}),
             'document_issued_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'document_issued_date_bs': NepaliDateInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'YYYY-MM-DD (B.S.)',
+                'autocomplete': 'off'}),
             'issued_place': forms.Select(attrs={'class': 'form-select'}),
 
             'is_politically_involved': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -78,6 +93,11 @@ class KYCForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['middle_name'].required = False
         self.fields['dob_bs'].required = False
+        self.fields['document_number'].required = True
+        self.fields['document_number'].widget.attrs['required'] = 'required'
+        self.fields['document_number'].error_messages = {
+            'required': 'Document number is required'
+        }
         super().__init__(*args, **kwargs)
         # Add Bootstrap classes to all fields
 

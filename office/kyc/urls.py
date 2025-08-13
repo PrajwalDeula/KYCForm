@@ -1,7 +1,7 @@
 # office/urls.py
 from django.urls import path
+from .views import kyc_bulk_delete
 from . import views
-
 app_name = 'kyc'
 
 urlpatterns = [
@@ -12,9 +12,7 @@ urlpatterns = [
     path('kyc_list/', views.kyc_list_view, name='kyc_list'),
     path('kyc/<int:kyc_id>/delete/', views.kyc_delete_view, name='kyc_delete'),
     # path('kyc_list/', views.kyc_list_view, name='kyc_list'),
-    path('<int:kyc_id>/update/', views.kyc_update_view, name='kyc_update'), 
-   
-
-
+    path('<int:kyc_id>/update/', views.kyc_update_view, name='kyc_update'),   
+    path('bulk-delete/', kyc_bulk_delete, name='kyc_bulk_delete'),
     path('kyc_detail/<int:kyc_id>/', views.kyc_detail_view, name='kyc_detail'),
 ]

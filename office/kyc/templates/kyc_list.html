@@ -185,6 +185,16 @@
     {% endif %}
 </div>
 </div>
+
+<div class="btn-group">
+    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+        <i class="fas fa-tasks me-1"></i> Bulk Actions
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="#" id="bulkDeleteBtn"><i class="fas fa-trash-alt me-2 text-danger"></i> Delete Selected</a></li>
+    </ul>
+</div>
+
     <!-- Export Button -->
     <div>
         <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
@@ -198,15 +208,17 @@
                 <table class="table table-hover align-middle mb-0" id="kycTable">
                     <thead class="table-light">
                         <tr>
+                             <th width="50">
+            <input type="checkbox" id="selectAll">
+        </th>
                             <th width="100">KYC ID</th>
                             <th>Full Name</th>
                             <th width="100">Gender</th>
-                            <th width="150">Created</th>
-                            <th width="150">Updated</th>
-                            <th width="120">Nationality</th>
                             <th width="110">DOB (AD)</th>
                             <th width="100">Document</th>
                             <th width="120">Contact</th>
+                            <th width="150">Created Date</th>
+                            <th width="150">Updated Date</th>
                             <th width="100">Status</th>
                             <th width="80">Actions</th>
                         </tr>
@@ -214,6 +226,10 @@
                     <tbody>
                         {% for kyc in kycs %}
                         <tr class="position-relative">
+                            <td> 
+                                <input type="checkbox" class="row-checkbox" data-id="{{ kyc.kyc_id }}">
+                            
+                            </td>
                             <td data-label="KYC ID">
                                 <span class="badge bg-primary bg-opacity-10 text-primary">#{{ kyc.kyc_id|default:"-" }}</span>
                             </td>
@@ -242,34 +258,7 @@
                                     </span>
                                 {% endif %}
                             </td>
-                                            <td data-label="Created">
-                    <div class="d-flex flex-column">
-                        <small class="text-muted">
-                            <i class="far fa-calendar-plus me-1"></i>
-                            {{ kyc.created_date|date:"Y-m-d" }}
-                        </small>
-                        <small class="text-muted small">
-                            {{ kyc.created_date|timesince }} ago
-                        </small>
-                    </div>
-                </td>
-                <td data-label="Updated">
-                    <div class="d-flex flex-column">
-                        <small class="text-muted">
-                            <i class="far fa-calendar-check me-1"></i>
-                            {{ kyc.updated_date|date:"Y-m-d" }}
-                        </small>
-                        <small class="text-muted small">
-                            {{ kyc.updated_date|timesince }} ago
-                        </small>
-                    </div>
-                </td>
-
-                            <td data-label="Nationality">
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-flag me-1"></i> {{ kyc.nationality|default:"-" }}
-                                </span>
-                            </td>
+             
                             <td data-label="DOB (AD)">
                                 <small class="text-muted">
                                     <i class="far fa-calendar me-1"></i> {{ kyc.date_of_birth_ad|date:"Y-m-d"|default:"-" }}
@@ -289,6 +278,23 @@
                                     </div>
                                 </small>
                             </td>
+                                                           <td data-label="Created">
+                    <div class="d-flex flex-column">
+                        <small class="text-muted">
+                            <i class="far fa-calendar-plus me-1"></i>
+                            {{ kyc.created_date|date:"Y-m-d" }}
+                        </small>
+                    </div>
+                </td>
+                <td data-label="Updated">
+                    <div class="d-flex flex-column">
+                        <small class="text-muted">
+                            <i class="far fa-calendar-check me-1"></i>
+                            {{ kyc.updated_date|date:"Y-m-d" }}
+                        </small>
+                        
+                    </div>
+                </td>
                             <td data-label="Status">
                                 {% if kyc.status == 'approved' %}
                                     <span class="badge bg-success bg-opacity-10 text-success">
@@ -308,10 +314,10 @@
                                 <div class="d-flex">
                                  <div class="btn-group" role="group">
     <!-- View Button: Blue -->
-    {% comment %} <a href="{% url 'kyc:kyc_detail' kyc.kyc_id %}" class="btn btn-sm btn-outline-primary"
+   <a href="{% url 'kyc:kyc_detail' kyc.kyc_id %}" class="btn btn-sm btn-outline-primary"
        data-bs-toggle="tooltip" title="View Details">
         <i class="fas fa-eye me-1"></i> View
-    </a> {% endcomment %}
+    </a>
 
     <!-- Edit Button: Orange -->
  <a href="{% url 'kyc:kyc_update' kyc.kyc_id %}" class="btn btn-sm btn-outline-warning">
@@ -403,61 +409,158 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endif %}
 });
 </script>
-
-<!-- Delete Confirmation Modal -->
+<!-- Delete Confirmation Modal (for single record) -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this KYC record? This action cannot be undone.
+                <p>Are you sure you want to delete this KYC record? This action cannot be undone.</p>
+                <div class="alert alert-warning p-2 mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <small>This record will be permanently removed from the system.</small>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i> Cancel
+                </button>
                 <form id="deleteForm" method="POST" action="">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i> Confirm Delete
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
+<!-- Bulk Delete Confirmation Modal -->
+<div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="bulkDeleteModalLabel">Confirm Bulk Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to delete <span id="selectedCount">0</span> KYC record(s). This action cannot be undone.</p>
+                <div class="alert alert-warning p-2 mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <small>All selected records will be permanently removed from the system.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmBulkDelete">
+                    <i class="fas fa-trash-alt me-2"></i> Confirm Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+{% endblock %}
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-// Initialize tooltips
 document.addEventListener('DOMContentLoaded', function() {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Delete button handler
+    // Delete button handler for single deletion
     var deleteButtons = document.querySelectorAll('.delete-btn');
     var deleteForm = document.getElementById('deleteForm');
-    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    
-    deleteButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            var kycId = this.getAttribute('data-id');
-            deleteForm.action = `/kyc/${kycId}/delete/`;
-            deleteModal.show();
+    if (deleteForm) {
+        var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var kycId = this.getAttribute('data-id');
+                deleteForm.action = `/kyc/${kycId}/delete/`;
+                deleteModal.show();
+            });
+        });
+    }
+
+        // Bulk delete confirmation handler
+    document.getElementById('confirmBulkDelete')?.addEventListener('click', function() {
+        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+        const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-id'));
+
+        
+        if (selectedIds.length === 0) {
+            alert('Please select at least one record to delete.');
+            return;
+        }
+
+        // Show loading state
+        const confirmBtn = this;
+        const originalBtnText = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+        confirmBtn.disabled = true;
+
+        // Prepare the request
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        selectedIds.forEach(id => {
+            formData.append('kyc_ids[]', id);
+        });
+
+        // Send the request
+        fetch("{% url 'kyc:kyc_bulk_delete' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal'));
+                modal.hide();
+                
+                // Reload the page to reflect changes
+                window.location.reload();
+            } else {
+                throw new Error(data.error || 'Unknown error occurred');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error: ' + error.message);
+        })
+        .finally(() => {
+            confirmBtn.innerHTML = originalBtnText;
+            confirmBtn.disabled = false;
         });
     });
 
+
     // Search functionality
-    document.getElementById('searchBtn').addEventListener('click', function() {
+    document.getElementById('searchBtn')?.addEventListener('click', function() {
         const searchTerm = document.getElementById('kycSearch').value.toLowerCase();
         filterTable(searchTerm);
     });
 
-    document.getElementById('kycSearch').addEventListener('keyup', function(e) {
+    document.getElementById('kycSearch')?.addEventListener('keyup', function(e) {
         if(e.key === 'Enter') {
             const searchTerm = this.value.toLowerCase();
             filterTable(searchTerm);
@@ -465,15 +568,132 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Status filter
-    document.getElementById('statusFilter').addEventListener('change', function() {
+    document.getElementById('statusFilter')?.addEventListener('change', function() {
         const status = this.value;
         filterTableByStatus(status);
     });
 
     // Export to Excel
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        exportToExcel();
+    document.getElementById('exportBtn')?.addEventListener('click', exportToExcel);
+
+    // Bulk delete operation
+    const selectAll = document.getElementById('selectAll');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+
+    // Select all checkbox
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateSelectAllState();
+        });
+    }
+
+    // Update individual checkboxes
+    document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectAllState);
     });
+
+    // Bulk delete button
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+            
+            if (selectedIds.length === 0) {
+                alert('Please select at least one record to delete.');
+                return;
+            }
+            
+            // Update modal display
+            document.getElementById('selectedCount').textContent = selectedIds.length;
+            
+            // Show confirmation modal
+            const bulkDeleteModal = new bootstrap.Modal(document.getElementById('bulkDeleteModal'));
+            bulkDeleteModal.show();
+        });
+    }
+
+    // Bulk delete form submission
+    if (bulkDeleteForm) {
+        bulkDeleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+            
+            if (selectedIds.length === 0) {
+                alert('Please select at least one record to delete.');
+                return;
+            }
+
+            // Add CSRF token and selected IDs to form data
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            selectedIds.forEach(id => {
+                formData.append('kyc_ids', id);
+            });
+
+            // Show loading state
+            const submitBtn = bulkDeleteForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+            submitBtn.disabled = true;
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal'));
+                    modal.hide();
+                    
+                    // Reload the page or update the table
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    function updateSelectAllState() {
+        const allCheckboxes = document.querySelectorAll('.row-checkbox');
+        const selectAll = document.getElementById('selectAll');
+        
+        if (selectAll) {
+            const checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+            selectAll.checked = checkedCount === allCheckboxes.length;
+            selectAll.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+        }
+    }
 });
 
 function filterTable(searchTerm) {
@@ -503,17 +723,12 @@ function filterTableByStatus(status) {
 }
 
 function exportToExcel() {
-    // Select the table
     const table = document.getElementById('kycTable');
-    
-    // Clone the table to avoid modifying the original
     const clone = table.cloneNode(true);
-    
-    // Remove action column from the clone
     const headers = clone.querySelectorAll('th');
     const rows = clone.querySelectorAll('tr');
     
-    // Find the index of the Actions column
+    // Find and remove Actions column
     let actionIndex = -1;
     headers.forEach((th, index) => {
         if (th.textContent.trim() === 'Actions') {
@@ -521,7 +736,6 @@ function exportToExcel() {
         }
     });
     
-    // Remove Actions column if found
     if (actionIndex !== -1) {
         rows.forEach(row => {
             const cells = row.querySelectorAll('td, th');
@@ -531,17 +745,13 @@ function exportToExcel() {
         });
     }
     
-    // Convert to worksheet
     const ws = XLSX.utils.table_to_sheet(clone);
-    
-    // Create workbook
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "KYC Records");
-    
-    // Export the workbook
     XLSX.writeFile(wb, "kyc_records.xlsx");
 }
 </script>
+{% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- OR Bootstrap 4 (requires jQuery) -->
@@ -549,4 +759,5 @@ function exportToExcel() {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% endblock %}
+<!-- Font Awesome CSS (for icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

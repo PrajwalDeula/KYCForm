@@ -1,11 +1,11 @@
 from django.contrib import admin
 from .models import KYCModel
-from .forms import KYCForm  # 1. Import your custom form
+from .forms import KYCForm
 
 class KYCAdmin(admin.ModelAdmin):
     form = KYCForm
 
-    list_display = ('first_name', 'last_name', 'gender', 'mobile', 'email', 'nationality')
+    list_display = ('first_name', 'last_name', 'gender', 'mobile', 'email', 'nationality', 'document_issued_date_bs', 'document_issued_date')
     search_fields = ('first_name', 'last_name', 'mobile', 'email')
     list_filter = ('gender', 'nationality', 'profession', 'qualification')
     ordering = ('-kyc_id',) 
@@ -17,7 +17,7 @@ class KYCAdmin(admin.ModelAdmin):
                 ('first_name', 'middle_name', 'last_name'), 
                 'nep_name',
                 ('gender', 'nationality'),
-                ('date_of_birth_ad', 'dob_bs'),
+                ('dob_bs', 'date_of_birth_ad'),  # Date of Birth fields together
                 'qualification',
                 'profession',
             )
@@ -25,11 +25,11 @@ class KYCAdmin(admin.ModelAdmin):
         ('Family Details', {
             'fields': (
                 'father_name',
-                'nep_father_name',              # Added
+                'nep_father_name',
                 'mother_name',
-                'father_mother_name',           # Added
+                'father_mother_name',
                 'grand_father_name',
-                'grandfather_in_law_name',      # Added
+                'grandfather_in_law_name',
                 'spouse_name',
                 'father_in_law_name',
                 'son_name',
@@ -42,7 +42,7 @@ class KYCAdmin(admin.ModelAdmin):
             'fields': (
                 'age_proof_doc', 
                 'document_number', 
-                'document_issued_date', 
+                ('document_issued_date_bs', 'document_issued_date'),  # Document issued dates together
                 'issued_place',
             )
         }),
@@ -77,5 +77,6 @@ class KYCAdmin(admin.ModelAdmin):
             )
         }),
     )
+
 
 admin.site.register(KYCModel, KYCAdmin)

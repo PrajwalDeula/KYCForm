@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import KYCModel
+from django.http import JsonResponse
 from django.core.paginator import Paginator
 from .forms import KYCForm
+from django.urls import reverse 
 from django.db.models import Q
+from django.views import View
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Home page view
 def home(request):
@@ -161,5 +167,68 @@ def kyc_delete_view(request, kyc_id):
 
 # View details of a single KYC record
 def kyc_detail_view(request, kyc_id):
-    kyc = get_object_or_404(KYCModel, id=kyc_id)
-    return render(request, 'office/kyc_detail.html', {'kyc': kyc})
+    kyc = get_object_or_404(KYCModel, kyc_id=kyc_id)
+    return render(request, 'kyc_detail.html', {'kyc': kyc})
+@csrf_exempt
+@require_POST
+
+
+def kyc_bulk_delete(request):
+    try:
+        # Try both POST form data and JSON body
+        if request.content_type == 'application/json':
+            import json
+            data = json.loads(request.body)
+            kyc_ids = data.get('kyc_ids', [])
+        else:
+            kyc_ids = request.POST.getlist('kyc_ids[]') or request.POST.getlist('kyc_ids')
+        
+        # Convert to integers - try both id and kyc_id fields
+        valid_ids = []
+        for id_str in kyc_ids:
+            try:
+                valid_ids.append(int(id_str))
+            except (ValueError, TypeError):
+                continue
+        
+        if not valid_ids:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No valid IDs provided'
+                }, status=400)
+            return redirect('kyc:kyc_list')
+        
+        # Delete records - try both id and kyc_id fields
+        deleted_count = 0
+        for id in valid_ids:
+            try:
+                # Try deleting by id first
+                kyc = get_object_or_404(KYCModel, id=id)
+                kyc.delete()
+                deleted_count += 1
+            except:
+                try:
+                    # Fall back to kyc_id if id fails
+                    kyc = get_object_or_404(KYCModel, kyc_id=id)
+                    kyc.delete()
+                    deleted_count += 1
+                except Exception as e:
+                    continue
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': f'Successfully deleted {deleted_count} records',
+                'deleted_count': deleted_count
+            })
+        
+        return redirect('kyc:kyc_list')
+        
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+        return redirect('kyc:kyc_list')

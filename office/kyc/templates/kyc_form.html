@@ -356,6 +356,14 @@
                         {{ form.qualification }}
                     </div>
 
+                    <!-- Risk Category -->
+<div class="form-group">
+    <label for="{{ form.risk_category.id_for_label }}" class="form-label">
+        Risk Category {% if form.risk_category.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    {{ form.risk_category }}
+</div>
+
                     <!-- Politically Involved -->
                     <div class="form-group form-check">
                         {{ form.is_politically_involved }}
@@ -384,21 +392,29 @@
                     </div>
 
                     <!-- Date of Birth BS/AD -->
-                    <div class="form-group d-flex align-items-center justify-content-between gap-3">
-                        <div class="d-flex flex-column flex-grow-1">
-                            <label for="{{ form.dob_bs.id_for_label }}" class="form-label">
-                                {{ form.dob_bs.label }} {% if form.dob_bs.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.dob_bs }}
-                        </div>
+                   <div class="form-group">
+    <label class="form-label">
+        Date of Birth {% if form.dob_bs.field.required or form.date_of_birth_ad.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    <div class="d-flex align-items-center gap-2 w-100">
+        <!-- BS Date -->
+        <div class="flex-grow-1">
+            {{ form.dob_bs }}
+        </div>
+        
+        <!-- AD Date -->
+        <div class="flex-grow-1">
+            {{ form.date_of_birth_ad }}
+        </div>
+    </div>
+    {% if form.dob_bs.errors %}
+        <div class="error-message">{{ form.dob_bs.errors }}</div>
+    {% endif %}
+    {% if form.date_of_birth_ad.errors %}
+        <div class="error-message">{{ form.date_of_birth_ad.errors }}</div>
+    {% endif %}
+</div>
 
-                        <div class="d-flex flex-column flex-grow-1">
-                            <label for="{{ form.date_of_birth_ad.id_for_label }}" class="form-label">
-                                {{ form.date_of_birth_ad.label }} {% if form.date_of_birth_ad.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.date_of_birth_ad }}
-                        </div>
-                    </div>
 
                     <!-- Nep Father Name -->
                     <div class="form-group">
@@ -431,14 +447,29 @@
                         </label>
                         {{ form.issued_place }}
                     </div>
+<!-- Document Issued Date (Combined BS/AD) -->
+<div class="form-group">
+    <label class="form-label">
+        Issued Date {% if form.document_issued_date_bs.field.required or form.document_issued_date.field.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    <div class="d-flex align-items-center gap-2 w-100">
+        <!-- BS Date -->
+        <div class="flex-grow-1">
+            {{ form.document_issued_date_bs }}
+        </div>
 
-                    <!-- Issued Date -->
-                    <div class="form-group">
-                        <label for="{{ form.document_issued_date.id_for_label }}" class="form-label">
-                            {{ form.document_issued_date.label }} {% if form.document_issued_date.field.required %}<span class="text-danger">*</span>{% endif %}
-                        </label>
-                        {{ form.document_issued_date }}
-                    </div>
+        <!-- AD Date -->
+        <div class="flex-grow-1">
+            {{ form.document_issued_date }}
+        </div>
+    </div>
+    {% if form.document_issued_date_bs.errors %}
+        <div class="error-message">{{ form.document_issued_date_bs.errors }}</div>
+    {% endif %}
+    {% if form.document_issued_date.errors %}
+        <div class="error-message">{{ form.document_issued_date.errors }}</div>
+    {% endif %}
+</div>
 
                     <!-- Father/Mother Name -->
                     <div class="form-group">

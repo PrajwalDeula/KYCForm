@@ -73,8 +73,16 @@ LOCAL_UNIT_CHOICES = [
     ('Birgunj Metropolitan City', 'Birgunj Metropolitan City'),
 ]
 
+RISK_CHOICES = [
+    ('LOW', 'Low'),
+    ('MEDIUM', 'Medium'),
+    ('HIGH', 'High'),
+]
+
 
 class KYCModel(models.Model):
+    
+
     kyc_id = models.AutoField(primary_key=True)
     salutation = models.CharField(max_length=10, choices=SALUTATION_CHOICES, default='Mr')
     first_name = models.CharField(max_length=50, blank=False, null=False)
@@ -85,6 +93,7 @@ class KYCModel(models.Model):
     nationality = models.CharField(max_length=50, choices=NATIONALITY_CHOICES,default='Nepalese')
     date_of_birth_ad = models.DateField(blank=True, null=True, default=datetime.date.today)
     dob_bs = NepaliDateField(blank=True, null=True)
+    risk_category = models.CharField(max_length=10,choices=RISK_CHOICES,default='LOW', verbose_name="Risk Category")
     qualification = models.CharField(max_length=100, choices=QUALIFICATION_CHOICES, blank=True, null=True)
     profession = models.CharField(max_length=50, choices=PROFESSION_CHOICES, default='Service') 
     created_date = models.DateTimeField(default=timezone.now)
@@ -105,8 +114,9 @@ class KYCModel(models.Model):
     is_aml_crime = models.BooleanField(default=False)
 
     age_proof_doc = models.CharField(max_length=50, choices=AGE_PROOF_DOC_CHOICES, default='Citizenship')
-    document_number = models.CharField(max_length=50, blank=True, null=True)
-    document_issued_date = models.DateField(blank=True, null=True, default=datetime.date.today)
+    document_number = models.CharField(max_length=100,verbose_name="Document Number",blank=False)
+    document_issued_date_bs = NepaliDateField(verbose_name="Document Issued Date (B.S.)")
+    document_issued_date = models.DateField(verbose_name="Document Issued Date (A.D.)")
     issued_place = models.CharField(max_length=100,choices=ISSUED_PLACE_CHOICES, blank=True, null=True)
     birth_place = models.CharField(max_length=50, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
