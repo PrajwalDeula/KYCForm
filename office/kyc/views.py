@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import KYCModel
+import random
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from .forms import KYCForm
+from datetime import datetime, timedelta
 from django.urls import reverse 
 from django.db.models import Q
 from django.views import View
@@ -113,6 +115,117 @@ def kyc_list_view(request):
     }
     
     return render(request, 'kyc_list.html', context)
+
+
+# kyc_lists table
+FIELD_MAPPING = {
+    'ClientNo': 'kyc_id',           # Maps 'ClientNo' to 'kyc_id' field
+    'NewClientNo': 'new_client_no', # Add your actual field names
+    'FullName': 'full_name',        # Map to existing fields in KYCModel
+    'MobileNo': 'mobile',
+    'IsPolicyIssued': 'is_policy_issued',
+    'CreatedBy': 'created_by',
+    'CreatedDate': 'created_date',
+}
+def kyc_lists_view(request):
+    # First, determine if we're using dummy data or real data
+    use_dummy = request.GET.get('dummy', 'false').lower() == 'true'
+    
+    if use_dummy:
+        # Generate dummy data function
+        def generate_dummy_kyc():
+            first_names = ['John', 'Jane', 'Robert', 'Emily', 'Michael', 'Sarah', 'David', 'Lisa']
+            last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis']
+            mobile_prefixes = ['984', '985', '986', '974', '975']
+            
+            for i in range(1, 101):  # Generate 100 dummy records
+                yield {
+                    'kyc_id': i,
+                    'ClientNo': f"CL{1000 + i}",
+                    'NewClientNo': f"NCL{2000 + i}",
+                    'FullName': f"{random.choice(first_names)} {random.choice(last_names)}",
+                    'MobileNo': f"{random.choice(mobile_prefixes)}{random.randint(1000000, 9999999)}",
+                    'IsPolicyIssued': random.choice([True, False]),
+                    'CreatedBy': random.choice(['admin', 'manager', 'agent1', 'agent2']),
+                    'CreatedDate': (datetime.now() - timedelta(days=random.randint(0, 365))).date()
+                }
+
+        # Paginate the dummy data
+        dummy_data = list(generate_dummy_kyc())
+        paginator = Paginator(dummy_data, 10)  # 10 items per page
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'kyc_list': page_obj,
+            'is_paginated': paginator.num_pages > 1,
+            'page_obj': page_obj,
+            'is_dummy_data': True  # Flag for template to show this is dummy data
+        }
+        
+    else:
+        # Get parameters with defaults for real data
+        order_by = request.GET.get('order_by', 'ClientNo')
+        order_dir = request.GET.get('order_dir', 'asc')
+        search_term = request.GET.get('search', '').strip()
+        page_number = request.GET.get('page', 1)
+
+        # Map the requested field to actual model field
+        actual_field = FIELD_MAPPING.get(order_by, 'kyc_id')  # Default to kyc_id if mapping not found
+
+        # Validate sorting direction
+        order_dir = 'desc' if order_dir == 'desc' else 'asc'
+
+        # Base queryset
+        kycs = KYCModel.objects.all()
+
+        # Search filter - update to use actual field names
+        if search_term:
+            kycs = kycs.filter(
+                Q(kyc_id__icontains=search_term) |
+                Q(new_client_no__icontains=search_term) |
+                Q(full_name__icontains=search_term) |
+                Q(mobile__icontains=search_term) |
+                Q(created_by__username__icontains=search_term)  # Assuming created_by is a User
+            )
+
+        # Apply sorting with the actual field name
+        order_prefix = '-' if order_dir == 'desc' else ''
+        kycs = kycs.order_by(f'{order_prefix}{actual_field}')
+
+        # Paginate the results
+        paginator = Paginator(kycs, 20)
+        try:
+            page_obj = paginator.page(page_number)
+        except:
+            page_obj = paginator.page(1)
+
+        # Preserve query parameters for pagination links
+        query_params = []
+        if search_term:
+            query_params.append(f'search={search_term}')
+        if order_by != 'ClientNo':
+            query_params.append(f'order_by={order_by}')
+        if order_dir != 'asc':
+            query_params.append(f'order_dir={order_dir}')
+
+        query_string = '&'.join(query_params)
+        if query_string:
+            query_string = f'&{query_string}'
+
+        context = {
+            'kyc_list': page_obj,
+            'order_by': order_by,  # Keep the original order_by for UI
+            'order_dir': order_dir,
+            'search_term': search_term,
+            'is_paginated': page_obj.has_other_pages(),
+            'total_records': paginator.count,
+            'query_string': query_string,
+            'request': request,
+            'is_dummy_data': False
+        }
+
+    return render(request, 'kyc_lists.html', context)
 
 # Create or Update KYC form based on presence of kyc_id
 def kyc_update_view(request, kyc_id):

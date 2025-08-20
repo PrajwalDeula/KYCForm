@@ -113,6 +113,7 @@
             font-weight: 500;
             transition: all 0.3s;
             border-radius: 5px;
+            
         }
 
         .btn-submit:hover {
@@ -165,6 +166,16 @@
                 width: auto;
             }
         }
+        
+        .field-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -179,24 +190,21 @@
     <div class="form-container">
         <h4 class="text-center sm-4 text-primary">KYC Record Form</h4>
 
-        <div class="row mb-3">
-    {% comment %} <div class="col-md-12 text-center">
-        <small class="text-muted">
-            {% if form.instance.created_date %}
-                Created on: {{ form.instance.created_date|date:"M d, Y H:i" }}
-            {% else %}
-                New KYC Application
-            {% endif %}
-        </small>
-    </div> {% endcomment %}
-</div>
-
-        <form method="POST" action="{% url 'kyc:kyc_create' %} ">
-
-
+        <form method="POST" action="#">
             {% csrf_token %}
+            <div class="d-flex justify-content-end">
+                <div class="btn-group gap-3">
+                    <a href="#" class="btn btn-sm btn-outline-secondary d-flex justify-content-center align-items-center">
+                        <i class="fas fa-arrow-left me-2"></i> BACK
+                    </a>
+                    <button type="submit" class="btn btn-submit btn-sm text-white">
+                        SUBMIT
+                    </button>
+                </div>
+            </div>
             
             <h5 class="section-header">Personal Details</h5>
+
             <div class="row">
                 <!-- Left Column -->
                 <div class="col-md-5 offset-md-1">
@@ -205,10 +213,12 @@
                         <label for="{{ form.first_name.id_for_label }}" class="form-label">
                             {{ form.first_name.label }} {% if form.first_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}
-                            <div class="error-message">{{ form.first_name.errors }}</div>
-                        {% endif %}
+                        <div class="field-wrapper">
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="error-message">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Last Name -->
@@ -216,10 +226,12 @@
                         <label for="{{ form.last_name.id_for_label }}" class="form-label">
                             {{ form.last_name.label }} {% if form.last_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}
-                            <div class="error-message">{{ form.last_name.errors }}</div>
-                        {% endif %}
+                        <div class="field-wrapper">
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="error-message">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Father Name -->
@@ -227,10 +239,12 @@
                         <label for="{{ form.father_name.id_for_label }}" class="form-label">
                             {{ form.father_name.label }} {% if form.father_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.father_name }}
-                        {% if form.father_name.errors %}
-                            <div class="error-message">{{ form.father_name.errors }}</div>
-                        {% endif %}
+                        <div class="field-wrapper">
+                            {{ form.father_name }}
+                            {% if form.father_name.errors %}
+                                <div class="error-message">{{ form.father_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Mobile -->
@@ -238,58 +252,104 @@
                         <label for="{{ form.mobile.id_for_label }}" class="form-label">
                             {{ form.mobile.label }} {% if form.mobile.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.mobile }}
-                        {% if form.mobile.errors %}
-                            <div class="error-message">{{ form.mobile.errors }}</div>
-                        {% endif %}
+                        <div class="field-wrapper">
+                            {{ form.mobile }}
+                            {% if form.mobile.errors %}
+                                <div class="error-message">{{ form.mobile.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
+
+                      <!-- National ID Number -->
+                                    <div class="form-group">
+                        <label for="{{ form.national_id_no.id_for_label }}" class="form-label">
+                            {{ form.national_id_no.label }} {% if form.national_id_no.field.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+                        <div class="field-wrapper">
+                            {{ form.national_id_no }}
+                            {% if form.national_id_no.errors %}
+                                <div class="error-message">{{ form.national_id_no.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
 
                     <!-- Age Proof Doc -->
                     <div class="form-group">
                         <label for="{{ form.age_proof_doc.id_for_label }}" class="form-label">
-                            {{ form.age_proof_doc.label }}
+                            {{ form.age_proof_doc.label }} {% if form.age_proof_doc.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.age_proof_doc }}
+                        <div class="field-wrapper">
+                            {{ form.age_proof_doc }}
+                            {% if form.age_proof_doc.errors %}
+                                <div class="error-message">{{ form.age_proof_doc.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Structure -->
                     <div class="form-group">
                         <label for="{{ form.structure.id_for_label }}" class="form-label">
-                            {{ form.structure.label }}
+                            {{ form.structure.label }} {% if form.structure.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.structure }}
+                        <div class="field-wrapper">
+                            {{ form.structure }}
+                            {% if form.structure.errors %}
+                                <div class="error-message">{{ form.structure.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Local Unit -->
                     <div class="form-group">
                         <label for="{{ form.local_unit.id_for_label }}" class="form-label">
-                            {{ form.local_unit.label }}
+                            {{ form.local_unit.label }} {% if form.local_unit.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.local_unit }}
+                        <div class="field-wrapper">
+                            {{ form.local_unit }}
+                            {% if form.local_unit.errors %}
+                                <div class="error-message">{{ form.local_unit.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Address -->
                     <div class="form-group">
                         <label for="{{ form.address.id_for_label }}" class="form-label">
-                            {{ form.address.label }}
+                            {{ form.address.label }} {% if form.address.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.address }}
+                        <div class="field-wrapper">
+                            {{ form.address }}
+                            {% if form.address.errors %}
+                                <div class="error-message">{{ form.address.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Temporary Address -->
                     <div class="form-group">
                         <label for="{{ form.temporary_address.id_for_label }}" class="form-label">
-                            {{ form.temporary_address.label }}
+                            {{ form.temporary_address.label }} {% if form.temporary_address.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.temporary_address }}
+                        <div class="field-wrapper">
+                            {{ form.temporary_address }}
+                            {% if form.temporary_address.errors %}
+                                <div class="error-message">{{ form.temporary_address.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Phone No -->
                     <div class="form-group">
                         <label for="{{ form.phone_no.id_for_label }}" class="form-label">
-                            {{ form.phone_no.label }}
+                            {{ form.phone_no.label }} {% if form.phone_no.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.phone_no }}
+                        <div class="field-wrapper">
+                            {{ form.phone_no }}
+                            {% if form.phone_no.errors %}
+                                <div class="error-message">{{ form.phone_no.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Profession -->
@@ -297,15 +357,25 @@
                         <label for="{{ form.profession.id_for_label }}" class="form-label">
                             {{ form.profession.label }} {% if form.profession.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.profession }}
+                        <div class="field-wrapper">
+                            {{ form.profession }}
+                            {% if form.profession.errors %}
+                                <div class="error-message">{{ form.profession.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Office Address -->
                     <div class="form-group">
                         <label for="{{ form.office_address.id_for_label }}" class="form-label">
-                            {{ form.office_address.label }}
+                            {{ form.office_address.label }} {% if form.office_address.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.office_address }}
+                        <div class="field-wrapper">
+                            {{ form.office_address }}
+                            {% if form.office_address.errors %}
+                                <div class="error-message">{{ form.office_address.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Income Mode -->
@@ -313,31 +383,51 @@
                         <label for="{{ form.income_mode.id_for_label }}" class="form-label">
                             {{ form.income_mode.label }} {% if form.income_mode.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.income_mode }}
+                        <div class="field-wrapper">
+                            {{ form.income_mode }}
+                            {% if form.income_mode.errors %}
+                                <div class="error-message">{{ form.income_mode.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- PAN No -->
                     <div class="form-group">
                         <label for="{{ form.pan_no.id_for_label }}" class="form-label">
-                            {{ form.pan_no.label }}
+                            {{ form.pan_no.label }} {% if form.pan_no.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.pan_no }}
+                        <div class="field-wrapper">
+                            {{ form.pan_no }}
+                            {% if form.pan_no.errors %}
+                                <div class="error-message">{{ form.pan_no.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Bank Ac Name -->
                     <div class="form-group">
                         <label for="{{ form.bank_ac_name.id_for_label }}" class="form-label">
-                            {{ form.bank_ac_name.label }}
+                            {{ form.bank_ac_name.label }} {% if form.bank_ac_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.bank_ac_name }}
+                        <div class="field-wrapper">
+                            {{ form.bank_ac_name }}
+                            {% if form.bank_ac_name.errors %}
+                                <div class="error-message">{{ form.bank_ac_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Nep Name -->
                     <div class="form-group">
                         <label for="{{ form.nep_name.id_for_label }}" class="form-label">
-                            {{ form.nep_name.label }}
+                            {{ form.nep_name.label }} {% if form.nep_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.nep_name }}
+                        <div class="field-wrapper">
+                            {{ form.nep_name }}
+                            {% if form.nep_name.errors %}
+                                <div class="error-message">{{ form.nep_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Gender -->
@@ -345,7 +435,12 @@
                         <label for="{{ form.gender.id_for_label }}" class="form-label">
                             {{ form.gender.label }} {% if form.gender.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.gender }}
+                        <div class="field-wrapper">
+                            {{ form.gender }}
+                            {% if form.gender.errors %}
+                                <div class="error-message">{{ form.gender.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Qualification -->
@@ -353,23 +448,25 @@
                         <label for="{{ form.qualification.id_for_label }}" class="form-label">
                             {{ form.qualification.label }} {% if form.qualification.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.qualification }}
+                        <div class="field-wrapper">
+                            {{ form.qualification }}
+                            {% if form.qualification.errors %}
+                                <div class="error-message">{{ form.qualification.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <!-- Risk Category -->
-<div class="form-group">
-    <label for="{{ form.risk_category.id_for_label }}" class="form-label">
-        Risk Category {% if form.risk_category.field.required %}<span class="text-danger">*</span>{% endif %}
-    </label>
-    {{ form.risk_category }}
-</div>
-
                     <!-- Politically Involved -->
-                    <div class="form-group form-check">
-                        {{ form.is_politically_involved }}
-                        <label for="{{ form.is_politically_involved.id_for_label }}" class="form-check-label">
+                    <div class="form-group">
+                        <label for="{{ form.is_politically_involved.id_for_label }}" class="form-label">
                             {{ form.is_politically_involved.label }} {% if form.is_politically_involved.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
+                        <div class="field-wrapper">
+                            {{ form.is_politically_involved }}
+                            {% if form.is_politically_involved.errors %}
+                                <div class="error-message">{{ form.is_politically_involved.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -378,19 +475,30 @@
                     <!-- Salutation -->
                     <div class="form-group">
                         <label for="{{ form.salutation.id_for_label }}" class="form-label">
-                            {{ form.salutation.label }}
+                            {{ form.salutation.label }} {% if form.salutation.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.salutation }}
+                        <div class="field-wrapper">
+                            {{ form.salutation }}
+                            {% if form.salutation.errors %}
+                                <div class="error-message">{{ form.salutation.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Middle Name -->
                     <div class="form-group">
                         <label for="{{ form.middle_name.id_for_label }}" class="form-label">
-                            {{ form.middle_name.label }}
+                            {{ form.middle_name.label }} {% if form.middle_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.middle_name }}
+                        <div class="field-wrapper">
+                            {{ form.middle_name }}
+                            {% if form.middle_name.errors %}
+                                <div class="error-message">{{ form.middle_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
+                  
                     <!-- Date of Birth BS/AD -->
                    <div class="form-group">
     <label class="form-label">
@@ -415,39 +523,61 @@
     {% endif %}
 </div>
 
-
                     <!-- Nep Father Name -->
                     <div class="form-group">
                         <label for="{{ form.nep_father_name.id_for_label }}" class="form-label">
-                            {{ form.nep_father_name.label }}
+                            {{ form.nep_father_name.label }} {% if form.nep_father_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.nep_father_name }}
+                        <div class="field-wrapper">
+                            {{ form.nep_father_name }}
+                            {% if form.nep_father_name.errors %}
+                                <div class="error-message">{{ form.nep_father_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Birth Place -->
                     <div class="form-group">
                         <label for="{{ form.birth_place.id_for_label }}" class="form-label">
-                            {{ form.birth_place.label }}
+                            {{ form.birth_place.label }} {% if form.birth_place.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.birth_place }}
+                        <div class="field-wrapper">
+                            {{ form.birth_place }}
+                            {% if form.birth_place.errors %}
+                                <div class="error-message">{{ form.birth_place.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <!-- Document Number -->
-                    <div class="form-group">
-                        <label for="{{ form.document_number.id_for_label }}" class="form-label">
-                            {{ form.document_number.label }} {% if form.document_number.field.required %}<span class="text-danger">*</span>{% endif %}
-                        </label>
+                                <!-- Document Number -->
+                <div class="form-group">
+                    <label for="{{ form.document_number.id_for_label }}" class="form-label">
+                        {{ form.document_number.label }} {% if form.document_number.field.required %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+                    <div class="field-wrapper">
                         {{ form.document_number }}
+                        {% if form.document_number.errors %}
+                            <div class="error-message">{{ form.document_number.errors }}</div>
+                        {% endif %}
                     </div>
+                </div>
+
+                    
 
                     <!-- Issued Place -->
                     <div class="form-group">
                         <label for="{{ form.issued_place.id_for_label }}" class="form-label">
                             {{ form.issued_place.label }} {% if form.issued_place.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.issued_place }}
+                        <div class="field-wrapper">
+                            {{ form.issued_place }}
+                            {% if form.issued_place.errors %}
+                                <div class="error-message">{{ form.issued_place.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
-<!-- Document Issued Date (Combined BS/AD) -->
+
+                   <!-- Document Issued Date (Combined BS/AD) -->
 <div class="form-group">
     <label class="form-label">
         Issued Date {% if form.document_issued_date_bs.field.required or form.document_issued_date.field.required %}<span class="text-danger">*</span>{% endif %}
@@ -474,49 +604,79 @@
                     <!-- Father/Mother Name -->
                     <div class="form-group">
                         <label for="{{ form.father_mother_name.id_for_label }}" class="form-label">
-                            {{ form.father_mother_name.label }}
+                            {{ form.father_mother_name.label }} {% if form.father_mother_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.father_mother_name }}
+                        <div class="field-wrapper">
+                            {{ form.father_mother_name }}
+                            {% if form.father_mother_name.errors %}
+                                <div class="error-message">{{ form.father_mother_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Ward No -->
                     <div class="form-group">
                         <label for="{{ form.ward_no.id_for_label }}" class="form-label">
-                            {{ form.ward_no.label }}
+                            {{ form.ward_no.label }} {% if form.ward_no.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.ward_no }}
+                        <div class="field-wrapper">
+                            {{ form.ward_no }}
+                            {% if form.ward_no.errors %}
+                                <div class="error-message">{{ form.ward_no.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Temporary District -->
                     <div class="form-group">
                         <label for="{{ form.temporary_district.id_for_label }}" class="form-label">
-                            {{ form.temporary_district.label }}
+                            {{ form.temporary_district.label }} {% if form.temporary_district.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.temporary_district }}
+                        <div class="field-wrapper">
+                            {{ form.temporary_district }}
+                            {% if form.temporary_district.errors %}
+                                <div class="error-message">{{ form.temporary_district.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- House No -->
                     <div class="form-group">
                         <label for="{{ form.house_no.id_for_label }}" class="form-label">
-                            {{ form.house_no.label }}
+                            {{ form.house_no.label }} {% if form.house_no.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.house_no }}
+                        <div class="field-wrapper">
+                            {{ form.house_no }}
+                            {% if form.house_no.errors %}
+                                <div class="error-message">{{ form.house_no.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Email -->
                     <div class="form-group">
                         <label for="{{ form.email.id_for_label }}" class="form-label">
-                            {{ form.email.label }}
+                            {{ form.email.label }} {% if form.email.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.email }}
+                        <div class="field-wrapper">
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-message">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Firm Name -->
                     <div class="form-group">
                         <label for="{{ form.firm_name.id_for_label }}" class="form-label">
-                            {{ form.firm_name.label }}
+                            {{ form.firm_name.label }} {% if form.firm_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.firm_name }}
+                        <div class="field-wrapper">
+                            {{ form.firm_name }}
+                            {% if form.firm_name.errors %}
+                                <div class="error-message">{{ form.firm_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Income Amount -->
@@ -524,31 +684,51 @@
                         <label for="{{ form.income_amount.id_for_label }}" class="form-label">
                             {{ form.income_amount.label }} {% if form.income_amount.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.income_amount }}
+                        <div class="field-wrapper">
+                            {{ form.income_amount }}
+                            {% if form.income_amount.errors %}
+                                <div class="error-message">{{ form.income_amount.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Bank Ac No -->
                     <div class="form-group">
                         <label for="{{ form.bank_ac_no.id_for_label }}" class="form-label">
-                            {{ form.bank_ac_no.label }}
+                            {{ form.bank_ac_no.label }} {% if form.bank_ac_no.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.bank_ac_no }}
+                        <div class="field-wrapper">
+                            {{ form.bank_ac_no }}
+                            {% if form.bank_ac_no.errors %}
+                                <div class="error-message">{{ form.bank_ac_no.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Address Nepali -->
                     <div class="form-group">
                         <label for="{{ form.address_nepali.id_for_label }}" class="form-label">
-                            {{ form.address_nepali.label }}
+                            {{ form.address_nepali.label }} {% if form.address_nepali.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.address_nepali }}
+                        <div class="field-wrapper">
+                            {{ form.address_nepali }}
+                            {% if form.address_nepali.errors %}
+                                <div class="error-message">{{ form.address_nepali.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Proposer Full Name -->
                     <div class="form-group">
                         <label for="{{ form.proposer_full_name.id_for_label }}" class="form-label">
-                            {{ form.proposer_full_name.label }}
+                            {{ form.proposer_full_name.label }} {% if form.proposer_full_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.proposer_full_name }}
+                        <div class="field-wrapper">
+                            {{ form.proposer_full_name }}
+                            {% if form.proposer_full_name.errors %}
+                                <div class="error-message">{{ form.proposer_full_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Nationality -->
@@ -556,15 +736,25 @@
                         <label for="{{ form.nationality.id_for_label }}" class="form-label">
                             {{ form.nationality.label }} {% if form.nationality.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.nationality }}
+                        <div class="field-wrapper">
+                            {{ form.nationality }}
+                            {% if form.nationality.errors %}
+                                <div class="error-message">{{ form.nationality.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- AML Crime -->
-                    <div class="form-group form-check">
-                        {{ form.is_aml_crime }}
-                        <label for="{{ form.is_aml_crime.id_for_label }}" class="form-check-label">
-                            {{ form.is_aml_crime.label }}
+                    <div class="form-group">
+                        <label for="{{ form.is_aml_crime.id_for_label }}" class="form-label">
+                            {{ form.is_aml_crime.label }} {% if form.is_aml_crime.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
+                        <div class="field-wrapper">
+                            {{ form.is_aml_crime }}
+                            {% if form.is_aml_crime.errors %}
+                                <div class="error-message">{{ form.is_aml_crime.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -576,49 +766,79 @@
                     <!-- Spouse Name -->
                     <div class="form-group">
                         <label for="{{ form.spouse_name.id_for_label }}" class="form-label">
-                            {{ form.spouse_name.label }}
+                            {{ form.spouse_name.label }} {% if form.spouse_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.spouse_name }}
+                        <div class="field-wrapper">
+                            {{ form.spouse_name }}
+                            {% if form.spouse_name.errors %}
+                                <div class="error-message">{{ form.spouse_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Mother Name -->
                     <div class="form-group">
                         <label for="{{ form.mother_name.id_for_label }}" class="form-label">
-                            {{ form.mother_name.label }}
+                            {{ form.mother_name.label }} {% if form.mother_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.mother_name }}
+                        <div class="field-wrapper">
+                            {{ form.mother_name }}
+                            {% if form.mother_name.errors %}
+                                <div class="error-message">{{ form.mother_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Son Name -->
                     <div class="form-group">
                         <label for="{{ form.son_name.id_for_label }}" class="form-label">
-                            {{ form.son_name.label }}
+                            {{ form.son_name.label }} {% if form.son_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.son_name }}
+                        <div class="field-wrapper">
+                            {{ form.son_name }}
+                            {% if form.son_name.errors %}
+                                <div class="error-message">{{ form.son_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Daughter/InLaw Name -->
                     <div class="form-group">
                         <label for="{{ form.daughter_in_law_name.id_for_label }}" class="form-label">
-                            {{ form.daughter_in_law_name.label }}
+                            {{ form.daughter_in_law_name.label }} {% if form.daughter_in_law_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.daughter_in_law_name }}
+                        <div class="field-wrapper">
+                            {{ form.daughter_in_law_name }}
+                            {% if form.daughter_in_law_name.errors %}
+                                <div class="error-message">{{ form.daughter_in_law_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- GrandFather/InLaw Name -->
                     <div class="form-group">
                         <label for="{{ form.grandfather_in_law_name.id_for_label }}" class="form-label">
-                            {{ form.grandfather_in_law_name.label }}
+                            {{ form.grandfather_in_law_name.label }} {% if form.grandfather_in_law_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.grandfather_in_law_name }}
+                        <div class="field-wrapper">
+                            {{ form.grandfather_in_law_name }}
+                            {% if form.grandfather_in_law_name.errors %}
+                                <div class="error-message">{{ form.grandfather_in_law_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Family Politically Involved -->
-                    <div class="form-group form-check">
-                        {{ form.is_family_politically_involved }}
-                        <label for="{{ form.is_family_politically_involved.id_for_label }}" class="form-check-label">
+                    <div class="form-group">
+                        <label for="{{ form.is_family_politically_involved.id_for_label }}" class="form-label">
                             {{ form.is_family_politically_involved.label }} {% if form.is_family_politically_involved.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
+                        <div class="field-wrapper">
+                            {{ form.is_family_politically_involved }}
+                            {% if form.is_family_politically_involved.errors %}
+                                <div class="error-message">{{ form.is_family_politically_involved.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -627,41 +847,55 @@
                     <!-- Grand Father Name -->
                     <div class="form-group">
                         <label for="{{ form.grand_father_name.id_for_label }}" class="form-label">
-                            {{ form.grand_father_name.label }}
+                            {{ form.grand_father_name.label }} {% if form.grand_father_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.grand_father_name }}
+                        <div class="field-wrapper">
+                            {{ form.grand_father_name }}
+                            {% if form.grand_father_name.errors %}
+                                <div class="error-message">{{ form.grand_father_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Daughter Name -->
                     <div class="form-group">
                         <label for="{{ form.daughter_name.id_for_label }}" class="form-label">
-                            {{ form.daughter_name.label }}
+                            {{ form.daughter_name.label }} {% if form.daughter_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.daughter_name }}
+                        <div class="field-wrapper">
+                            {{ form.daughter_name }}
+                            {% if form.daughter_name.errors %}
+                                <div class="error-message">{{ form.daughter_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Father/InLaw Name -->
                     <div class="form-group">
                         <label for="{{ form.father_in_law_name.id_for_label }}" class="form-label">
-                            {{ form.father_in_law_name.label }}
+                            {{ form.father_in_law_name.label }} {% if form.father_in_law_name.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
-                        {{ form.father_in_law_name }}
+                        <div class="field-wrapper">
+                            {{ form.father_in_law_name }}
+                            {% if form.father_in_law_name.errors %}
+                                <div class="error-message">{{ form.father_in_law_name.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Family AML Crime -->
-                    <div class="form-group form-check">
-                        {{ form.is_family_aml_crime }}
-                        <label for="{{ form.is_family_aml_crime.id_for_label }}" class="form-check-label">
-                            {{ form.is_family_aml_crime.label }}
+                    <div class="form-group">
+                        <label for="{{ form.is_family_aml_crime.id_for_label }}" class="form-label">
+                            {{ form.is_family_aml_crime.label }} {% if form.is_family_aml_crime.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
+                        <div class="field-wrapper">
+                            {{ form.is_family_aml_crime }}
+                            {% if form.is_family_aml_crime.errors %}
+                                <div class="error-message">{{ form.is_family_aml_crime.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                <button type="submit" class="btn btn-submit btn-lg">
-                    Submit
-                </button>
             </div>
         </form>
     </div>
@@ -669,11 +903,350 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
+    
     <script>
         $(document).ready(function(){
+           // Helper functions
+            function markFieldInvalid(field, message) {
+                field.addClass('is-invalid');
+                // Remove any existing error messages
+                field.nextAll('.error-message').remove();
+                field.after('<div class="error-message">' + message + '</div>');
+            }
+            
+            function clearFieldError(field) {
+                field.removeClass('is-invalid');
+                field.nextAll('.error-message').remove();
+            }
+
+            
+            
+            function isValidEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            function isValidMobile(mobile) {
+                const re = /^9\d{1,2}-\d{7}$/;
+                return re.test(mobile);
+            }
+            
+            function isValidDate(dateString) {
+                const re = /^\d{4}-\d{2}-\d{2}$/;
+                return re.test(dateString);
+            }
+            
+            function isValidPAN(pan) {
+                const re = /^\d{9}$/; // Changed to 9 digits only
+                return re.test(pan);
+            }
+
+            function isValidWardNo(wardNo) {
+                const num = parseInt(wardNo);
+                return !isNaN(num) && num >= 1 && num <= 36;
+            }
+
+            function isValidIncomeAmount(amount) {
+                // Check if it's a whole number (no decimals)
+                const re = /^\d+$/;
+                return re.test(amount);
+            }
+
+            function isValidDocumentNumber(docNumber) {
+                // Only numbers allowed
+                const re = /^\d+$/;
+                return re.test(docNumber);
+            }
+
+            function isValidBankAccountNumber(bankNumber) {
+                // Only numbers allowed
+                const re = /^\d+$/;
+                return re.test(bankNumber);
+            }
+
             // Apply input mask for mobile number
-            $('#{{ form.mobile.id_for_label }}').inputmask('999-9999999');
+            $('#id_mobile').inputmask('999-9999999');
+
+            // Apply input mask for Date of Birth BS field (YYYY-MM-DD format)
+            $('#id_dob_bs').inputmask('9999-99-99', {placeholder: "YYYY-MM-DD"});
+            
+            // Apply input mask for Document Issued Date BS field
+            $('#id_document_issued_date_bs').inputmask('9999-99-99', {placeholder: "YYYY-MM-DD"});
+
+            // Apply input mask for phone number
+            $('#id_phone_no').inputmask('999-9999999');
+            
+            // Apply input mask for PAN number (9 digits only)
+            $('#id_pan_no').inputmask('999999999', {placeholder: ""});
+
+                        // Apply input mask for document number (format: XXX-XXXXX-XXXX)
+    $('#id_document_number').inputmask('999-99999-9999', {placeholder: "", greedy: false});
+
+    // Custom validation function for document number with hyphens
+    function isValidDocumentNumber(docNumber) {
+        // Allow numbers and hyphens in specific pattern
+        const re = /^\d{3}-\d{5}-\d{4}$/;
+        return re.test(docNumber);
+        }
+
+// Update the document number validation to remove non-digit characters before checking
+    $('#id_document_number').on('blur', function() {
+        // Only validate if there's a value
+        if ($(this).val().trim()) {
+            // Remove any non-digit characters for validation
+            const rawValue = $(this).val().replace(/\D/g, '');
+            
+            // Check if it has the right number of digits (3-5-4 = 12 digits total)
+            if (rawValue.length !== 12) {
+                markFieldInvalid($(this), 'Document number must have 12 digits (format: XXX-XXXXX-XXXX)');
+            } else {
+                clearFieldError($(this));
+            }
+        }
+    });
+
+    // In the form submission validation, update the document number check:
+    const docNumberField = $('#id_document_number');
+    if (docNumberField.val().trim()) {
+        // Remove non-digit characters to check the length
+        const rawValue = docNumberField.val().replace(/\D/g, '');
+        
+        if (rawValue.length !== 12) {
+            isValid = false;
+            markFieldInvalid(docNumberField, 'Document number must have 12 digits (format: XXX-XXXXX-XXXX)');
+            if (!firstErrorField) firstErrorField = docNumberField[0];
+        }
+    }
+
+                // Apply input mask for National ID No field (format: XXX-XX-XXXXX)
+            $('#id_national_id_no').inputmask('999-99-99999', {placeholder: "", greedy: false});
+
+            // National ID No validation
+            function isValidNationalId(nationalId) {
+                // Allow numbers and hyphens in specific pattern
+                const re = /^\d{3}-\d{2}-\d{5}$/;
+                return re.test(nationalId);
+            }
+
+            // National ID No validation on blur
+            $('#id_national_id_no').on('blur', function() {
+                // Only validate if there's a value
+                if ($(this).val().trim()) {
+                    // Remove any non-digit characters for validation
+                    const rawValue = $(this).val().replace(/\D/g, '');
+                    
+                    // Check if it has the right number of digits (3-2-5 = 10 digits total)
+                    if (rawValue.length !== 10) {
+                        markFieldInvalid($(this), 'National ID number must have 10 digits (format: XXX-XX-XXXXX)');
+                    } else {
+                        clearFieldError($(this));
+                    }
+                }
+            });
+
+
+
+            // Only allow numbers for house number
+            $('#id_house_no').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // Only allow numbers for bank account number
+            $('#id_bank_ac_no').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+                   // Only allow numbers for ward number
+            $('#id_ward_no').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Validate ward number range (1-36)
+                const wardValue = parseInt(this.value);
+                if (this.value && isNaN(wardValue) || wardValue < 1 || wardValue > 36) {
+                    markFieldInvalid($(this), 'Ward number must be between 1 and 36');
+                } else {
+                    clearFieldError($(this));
+                }
+            });
+            
+
+            
+
+            // Nepali font validation (Devanagari script)
+            const nepaliRegex = /^[\u0900-\u097F\u1CD0-\u1CFF\uA8E0-\uA8FF ]+$/;
+            
+            // Nepali field validation on blur
+            $('#id_nep_name').on('blur', function() {
+                if ($(this).val().trim() && !nepaliRegex.test($(this).val())) {
+                    markFieldInvalid($(this), 'कृपया नेपालीमा मात्र लेख्नुहोस्');
+                } else {
+                    clearFieldError($(this));
+                }
+            });
+            
+            $('#id_nep_father_name').on('blur', function() {
+                if ($(this).val().trim() && !nepaliRegex.test($(this).val())) {
+                    markFieldInvalid($(this), 'कृपया नेपालीमा मात्र लेख्नुहोस्');
+                } else {
+                    clearFieldError($(this));
+                }
+            });
+            
+            $('#id_address_nepali').on('blur', function() {
+                if ($(this).val().trim() && !nepaliRegex.test($(this).val())) {
+                    markFieldInvalid($(this), 'कृपया नेपालीमा मात्र लेख्नुहोस्');
+                } else {
+                    clearFieldError($(this));
+                }
+            });
+
+            // Remove default 0 from house number
+            $('#id_house_no').val('');
+
+            // Form validation
+            $('form').submit(function(e) {
+                let isValid = true;
+                let firstErrorField = null;
+                
+                // Clear previous error highlights
+                $('.form-control, .form-select').removeClass('is-invalid');
+                $('.error-message').remove();
+                
+                // Required field validation
+                $('[required]').each(function() {
+                    if (!$(this).val().trim()) {
+                        isValid = false;
+                        markFieldInvalid($(this), 'This field is required');
+                        if (!firstErrorField) firstErrorField = this;
+                    }
+                });
+                
+                // Email validation
+                const emailField = $('#id_email');
+                if (emailField.val().trim() && !isValidEmail(emailField.val())) {
+                    isValid = false;
+                    markFieldInvalid(emailField, 'Please enter a valid email address');
+                    if (!firstErrorField) firstErrorField = emailField[0];
+                }
+                
+                // Mobile number validation
+                const mobileField = $('#id_mobile');
+                if (mobileField.val().trim() && !isValidMobile(mobileField.val())) {
+                    isValid = false;
+                    markFieldInvalid(mobileField, 'Please enter a valid mobile number (format: 98-1234567)');
+                    if (!firstErrorField) firstErrorField = mobileField[0];
+                }
+                
+                // Date of Birth validation
+                const dobBsField = $('#id_dob_bs');
+                const dobAdField = $('#id_date_of_birth_ad');
+                
+                if (dobBsField.val().trim() && !isValidDate(dobBsField.val())) {
+                    isValid = false;
+                    markFieldInvalid(dobBsField, 'Please enter a valid date (YYYY-MM-DD)');
+                    if (!firstErrorField) firstErrorField = dobBsField[0];
+                }
+                
+                if (dobAdField.val().trim() && !isValidDate(dobAdField.val())) {
+                    isValid = false;
+                    markFieldInvalid(dobAdField, 'Please enter a valid date (YYYY-MM-DD)');
+                    if (!firstErrorField) firstErrorField = dobAdField[0];
+                }
+                
+                // Document issued date validation
+                const docIssuedBsField = $('#id_document_issued_date_bs');
+                const docIssuedAdField = $('#id_document_issued_date');
+                
+                if (docIssuedBsField.val().trim() && !isValidDate(docIssuedBsField.val())) {
+                    isValid = false;
+                    markFieldInvalid(docIssuedBsField, 'Please enter a valid date (YYYY-MM-DD)');
+                    if (!firstErrorField) firstErrorField = docIssuedBsField[0];
+                }
+                
+                if (docIssuedAdField.val().trim() && !isValidDate(docIssuedAdField.val())) {
+                    isValid = false;
+                    markFieldInvalid(docIssuedAdField, 'Please enter a valid date (YYYY-MM-DD)');
+                    if (!firstErrorField) firstErrorField = docIssuedAdField[0];
+                }
+                
+  
+                
+                // Bank account number validation (only numbers)
+                const bankAcNoField = $('#id_bank_ac_no');
+                if (bankAcNoField.val().trim() && !isValidBankAccountNumber(bankAcNoField.val())) {
+                    isValid = false;
+                    markFieldInvalid(bankAcNoField, 'Please enter numbers only for bank account number');
+                    if (!firstErrorField) firstErrorField = bankAcNoField[0];
+                }
+                
+                // House number validation (only numbers)
+                const houseNoField = $('#id_house_no');
+                if (houseNoField.val().trim() && !isValidDocumentNumber(houseNoField.val())) {
+                    isValid = false;
+                    markFieldInvalid(houseNoField, 'Please enter numbers only for house number');
+                    if (!firstErrorField) firstErrorField = houseNoField[0];
+                }
+                                    
+                // PAN number validation (9 digits)
+                const panField = $('#id_pan_no');
+                if (panField.val().trim() && !isValidPAN(panField.val())) {
+                    isValid = false;
+                    markFieldInvalid(panField, 'Please enter a valid PAN number (9 digits only)');
+                    if (!firstErrorField) firstErrorField = panField[0];
+                }
+
+                      // Ward number validation (1-36)
+                const wardField = $('#id_ward_no');
+                if (wardField.val().trim() && !isValidWardNo(wardField.val())) {
+                    isValid = false;
+                    markFieldInvalid(wardField, 'Please enter a valid ward number (1-36)');
+                    if (!firstErrorField) firstErrorField = wardField[0];
+                }
+                
+                
+             
+       
+                // Income amount validation (no decimals)
+                const incomeField = $('#id_income_amount');
+                if (incomeField.val().trim() && !isValidIncomeAmount(incomeField.val())) {
+                    isValid = false;
+                    markFieldInvalid(incomeField, 'Please enter a whole number (no decimals)');
+                    if (!firstErrorField) firstErrorField = incomeField[0];
+                }
+                
+                // Nepali font validation
+                const nepNameField = $('#id_nep_name');
+                if (nepNameField.val().trim() && !nepaliRegex.test(nepNameField.val())) {
+                    isValid = false;
+                    markFieldInvalid(nepNameField, 'कृपया नेपाली फन्टमा मात्र लेख्नुहोस्');
+                    if (!firstErrorField) firstErrorField = nepNameField[0];
+                }
+                
+                const nepFatherField = $('#id_nep_father_name');
+                if (nepFatherField.val().trim() && !nepaliRegex.test(nepFatherField.val())) {
+                    isValid = false;
+                    markFieldInvalid(nepFatherField, 'कृपया नेपाली फन्टमा मात्र लेख्नुहोस्');
+                    if (!firstErrorField) firstErrorField = nepFatherField[0];
+                }
+                
+                const addressNepField = $('#id_address_nepali');
+                if (addressNepField.val().trim() && !nepaliRegex.test(addressNepField.val())) {
+                    isValid = false;
+                    markFieldInvalid(addressNepField, 'कृपया नेपाली फन्टमा मात्र लेख्नुहोस्');
+                    if (!firstErrorField) firstErrorField = addressNepField[0];
+                }
+                
+                // If not valid, prevent form submission and scroll to first error
+                if (!isValid) {
+                    e.preventDefault();
+                    if (firstErrorField) {
+                        $('html, body').animate({
+                            scrollTop: $(firstErrorField).offset().top - 100
+                        }, 500);
+                        $(firstErrorField).focus();
+                    }
+                }
+            });
         });
-    </script>
+    </script>  
 </body>
 </html>
