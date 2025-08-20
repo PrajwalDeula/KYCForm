@@ -3,6 +3,16 @@ from .models import KYCModel
 from nepali_datetime_field.forms import NepaliDateInput
 
 class KYCForm(forms.ModelForm):
+    national_id_no = forms.CharField(
+        max_length=12,  # XXX-XXXXX-XXXX is 14 characters with hyphens
+        required=True,  # Set to required like document_number
+        label="National ID No",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'XXX-XXXXX-XXXX',
+            'required': 'required'  # Add required attribute for HTML validation
+        })
+    )
 
 
     class Meta:
@@ -55,7 +65,6 @@ class KYCForm(forms.ModelForm):
 
             'age_proof_doc': forms.Select(attrs={'class': 'form-select'}),
             'document_number': forms.TextInput(attrs={'class': 'form-control'}),
-          'national_id_no': forms.TextInput(attrs={ 'class': 'form-control','placeholder': 'XXX-XXXXX-XXXX' }),
             'document_issued_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'document_issued_date_bs': NepaliDateInput(attrs={
                 'class': 'form-control',
@@ -79,7 +88,7 @@ class KYCForm(forms.ModelForm):
             'phone_no': forms.TextInput(attrs={'class': 'form-control','placeholder':'Enter Phone No.'}),
 
             'income_mode': forms.Select(attrs={'class': 'form-select'}),
-            'income_amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'income_amount': forms.TextInput(attrs={'class': 'form-control'}),
             'pan_no': forms.TextInput(attrs={'class': 'form-control','placeholder':'Enter PAN Number'}),
             'bank_ac_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank Name'}),
             'bank_ac_no': forms.TextInput(attrs={'class': 'form-control'}),
@@ -101,10 +110,10 @@ class KYCForm(forms.ModelForm):
         self.fields['document_number'].error_messages = {
             'required': 'Document number is required'
         }
-        
-        # Configure national_id_no field with the same settings
+         # Configure national_id_no field with the same settings
         self.fields['national_id_no'].required = True
         self.fields['national_id_no'].widget.attrs['required'] = 'required'
         self.fields['national_id_no'].error_messages = {
             'required': 'National ID number is required'
         }
+       
