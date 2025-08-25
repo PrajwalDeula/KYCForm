@@ -194,7 +194,7 @@
             {% csrf_token %}
             <div class="d-flex justify-content-end">
                 <div class="btn-group gap-3">
-                    <a href="#" class="btn btn-sm btn-outline-secondary d-flex justify-content-center align-items-center">
+                    <a href="{% url 'kyc:kyc_login' %}" class="btn btn-sm btn-outline-secondary d-flex justify-content-center align-items-center">
                         <i class="fas fa-arrow-left me-2"></i> BACK
                     </a>
                     <button type="submit" class="btn btn-submit btn-sm text-white">

@@ -26,16 +26,28 @@ def kyc_login_view(request):
         if form.is_valid():
             policy_no = form.cleaned_data["policy_no"]
             dob = form.cleaned_data["dob"]
-            print("Hello")
-
-         
-            kyc = KYCModel.objects.get(policy_no=policy_no, date_of_birth_ad=dob)
-                # Redirect with kyc_id in URL instead of session
+            
+            try:
+                # Try to find the KYC record
+                kyc = KYCModel.objects.get(policy_no=policy_no, date_of_birth_ad=dob)
                 
-            request.session["kyc_id"] = kyc.kyc_id
-            request.session.modified = True
-            return redirect("kyc:kyc_create")
-
+                # Store kyc_id in session and redirect
+                request.session["kyc_id"] = kyc.kyc_id
+                request.session.modified = True
+                return redirect("kyc:kyc_create")
+                
+            except KYCModel.DoesNotExist:
+                # Handle case where no matching record is found
+                messages.error(request, "The policy number and date of birth combination was not found. Please check your details and try again.")
+                
+            except Exception as e:
+                # Handle any other unexpected errors
+                messages.error(request, "An error occurred during login. Please try again.")
+                # You might want to log the actual error for debugging:
+                # import logging
+                # logger = logging.getLogger(__name__)
+                # logger.error(f"Login error: {str(e)}")
+    
     else:
         form = LoginForm()
 

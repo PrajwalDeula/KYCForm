@@ -7,38 +7,297 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Insurance Portal</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    /* Your existing CSS styles */
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .login-card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .login-card:hover {
+      transform: translateY(-5px);
+    }
+    .form-control:focus {
+      border-color: #4e73df;
+      box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+    }
+    .btn-primary {
+      background-color: #4e73df;
+      border: none;
+      padding: 12px 0;
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      background-color: #2e59d9;
+    }
+    .policy-help {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+    .logo {
+      max-width: 180px;
+      margin: 0 auto 0.5rem;
+      display: block;
+    }
+    .card-header {
+      background: none;
+      border-bottom: none;
+      padding: 1rem 1rem 0.25rem;
+    }
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    .toast {
+      background-color: white;
+      border-left: 4px solid;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .toast-error {
+      border-left-color: #e74a3b;
+    }
+    .toast-error .toast-header {
+      color: #e74a3b;
+      background-color: rgba(231, 74, 59, 0.1);
+    }
+    .toast-success {
+      border-left-color: #1cc88a;
+    }
+    .toast-success .toast-header {
+      color: #1cc88a;
+      background-color: rgba(28, 200, 138, 0.1);
+    }
+    .spinner-border-sm {
+      width: 1rem;
+      height: 1rem;
+    }
+  </style>
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+<body class="d-flex align-items-center justify-content-center">
 
-  <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
-    <h4 class="text-center mb-4">Login</h4>
-    <form method="post" novalidate>
-      {% csrf_token %}
-
-      <!-- Policy No -->
-      <div class="mb-3">
-        {{ form.policy_no.label_tag }}
-        {{ form.policy_no }}
-        {% if form.policy_no.errors %}
-          <div class="text-danger small">{{ form.policy_no.errors }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Date of Birth -->
-      <div class="mb-3">
-        {{ form.dob.label_tag }}
-        {{ form.dob }}
-        {% if form.dob.errors %}
-          <div class="text-danger small">{{ form.dob.errors }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Submit Button -->
-      <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
-    </form>
+  <!-- Toast Container -->
+  <div class="toast-container">
+    <!-- Toast templates will be inserted here by JavaScript -->
   </div>
 
+  <div class="card login-card p-4" style="max-width: 420px; width: 100%;">
+    <div class="card-header text-center">
+      <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiM0ZTczZGYiIGQ9Ik00NSA0MGMxMCAwIDE4LjUgMy41IDI1IDEwLjVTODAgNTUgODAgNjVjMCAxMC0zLjUgMTguNS0xMC41IDI1UzU1IDEwMCA0NSAxMDBTMjYuNSA5Ni41IDIwIDg5LjZTMTAgNzUgMTAgNjVjMC0xMCAzLjUtMTguNSAxMC41LTI1UzM1IDQwIDQ1IDQweiIvPjxwYXRoIGZpbGw9IiM4MGEwZmYiIGQ9Ik04NSA0MGMyMCAwIDM1IDUgNDUgMTVzMTUgMjUgMTUgNDVjMCAyMC01IDM1LTE1IDQ1cy0yNSAxNS00NSAxNWMwIDAgMC0zMCAwLTYwczAtNDAgMC00MHoiLz48dGV4dCB4PSI0NSIgeT0iNjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiI+SU5TVVJFOjwvdGV4dD48dGV4dCB4PSI0NSIgeT0iODUiIGZvbnQtZmFmaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiI+UE9SVEFMPC90ZXh0Pjwvc3ZnPg==" alt="Insurance Portal Logo" class="logo">
+      <h4 class="mb-1">Welcome</h4>
+      <p class="text-muted small">Sign in to access your KYC Form</p>
+    </div>
+    
+    <div class="card-body">
+      <!-- Simple message display for debugging -->
+      {% if messages %}
+        <div class="d-none" id="message-container">
+          {% for message in messages %}
+            <div class="message" data-tags="{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <form method="post" novalidate id="loginForm">
+        {% csrf_token %}
+
+        <!-- Policy No -->
+        <div class="mb-3">
+          <label for="{{ form.policy_no.id_for_label }}" class="form-label fw-bold">{{ form.policy_no.label }}</label>
+          <input type="text" 
+                 class="form-control {% if form.policy_no.errors %}is-invalid{% endif %}" 
+                 id="{{ form.policy_no.id_for_label }}" 
+                 name="{{ form.policy_no.name }}" 
+                 value="{{ form.policy_no.value|default:'' }}"
+                 placeholder="Enter your policy number"
+                 required>
+          {% if form.policy_no.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.policy_no.errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="policy-help">Your policy number can be found on your insurance card or documents.</div>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="mb-4">
+          <label for="{{ form.dob.id_for_label }}" class="form-label fw-bold">{{ form.dob.label }}</label>
+          <input type="date" 
+                 class="form-control {% if form.dob.errors %}is-invalid{% endif %}" 
+                 id="{{ form.dob.id_for_label }}" 
+                 name="{{ form.dob.name }}" 
+                 value="{{ form.dob.value|default:'' }}"
+                 required>
+          {% if form.dob.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.dob.errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-primary btn-lg">Log In</button>
+        </div>
+        
+        <div class="text-center">
+          <a href="#" class="text-decoration-none small">Forgot your policy number?</a>
+        </div>
+      </form>
+    </div>
+    
+    <div class="card-footer text-center pt-3 bg-transparent border-0">
+      <p class="small text-muted">Don't have an account? <a href="#" class="text-decoration-none">Contact support</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('loginForm');
+      const toastContainer = document.querySelector('.toast-container');
+      let isSubmitting = false;
+      
+      // Function to show toast notifications
+      function showToast(message, type = 'error') {
+        // Map Django message tags to our types
+        const typeMap = {
+          'error': 'error',
+          'success': 'success',
+          'warning': 'error',
+          'info': 'error',
+          'debug': 'error'
+        };
+        
+        const toastType = typeMap[type] || 'error';
+        
+        const toastId = 'toast-' + Date.now();
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${toastType} mb-3`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.id = toastId;
+        
+        toast.innerHTML = `
+          <div class="toast-header">
+            <i class="bi ${toastType === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle'} me-2"></i>
+            <strong class="me-auto">${toastType === 'error' ? 'Error' : 'Success'}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            ${message}
+          </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        const bsToast = new bootstrap.Toast(toast, {
+          autohide: true,
+          delay: 5000
+        });
+        
+        bsToast.show();
+        
+        // Remove toast from DOM after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+          toast.remove();
+        });
+      }
+      
+      // Check for Django messages and display them as toasts
+      const messageContainer = document.getElementById('message-container');
+      if (messageContainer) {
+        const messages = messageContainer.querySelectorAll('.message');
+        messages.forEach(messageEl => {
+          const message = messageEl.textContent;
+          const tags = messageEl.getAttribute('data-tags');
+          showToast(message, tags);
+        });
+      }
+      
+      // Check for field errors
+      {% if form.policy_no.errors %}
+        {% for error in form.policy_no.errors %}
+          showToast('Policy number: {{ error|escapejs }}', 'error');
+        {% endfor %}
+      {% endif %}
+      
+      {% if form.dob.errors %}
+        {% for error in form.dob.errors %}
+          showToast('Date of Birth: {{ error|escapejs }}', 'error');
+        {% endfor %}
+      {% endif %}
+      
+      // Handle form submission to prevent multiple clicks
+      form.addEventListener('submit', function(event) {
+        if (isSubmitting) {
+          event.preventDefault();
+          return false;
+        }
+        
+        let isValid = true;
+        const policyInput = document.getElementById('{{ form.policy_no.id_for_label }}');
+        const dobInput = document.getElementById('{{ form.dob.id_for_label }}');
+        
+        // Clear previous error indications
+        policyInput.classList.remove('is-invalid');
+        dobInput.classList.remove('is-invalid');
+        
+        // Validate policy number
+        if (!policyInput.value.trim()) {
+          policyInput.classList.add('is-invalid');
+          showToast('Please enter your policy number', 'error');
+          isValid = false;
+        }
+        
+        // Validate date of birth
+        if (!dobInput.value) {
+          dobInput.classList.add('is-invalid');
+          showToast('Please enter your date of birth', 'error');
+          isValid = false;
+        }
+        
+        if (!isValid) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        
+        isSubmitting = true;
+        
+        // Disable the submit button to prevent double clicks
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Logging in...';
+        
+        // Allow form to submit normally
+        return true;
+      });
+      
+      // Re-enable button if validation fails and form doesn't submit
+      form.addEventListener('invalid', function() {
+        isSubmitting = false;
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Log In';
+      }, true);
+    });
+  </script>
+  
+  <!-- Bootstrap JS (required for toast functionality) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
