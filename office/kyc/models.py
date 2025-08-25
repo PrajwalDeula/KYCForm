@@ -81,7 +81,7 @@ class KYCModel(models.Model):
     document_issued_date = models.DateField(verbose_name="Document Issued Date (A.D.)")
     issued_place = models.CharField(max_length=100, choices=ISSUED_PLACE_CHOICES, blank=True, null=True)
     birth_place = models.CharField(max_length=50, blank=True, null=True)
-    
+    policy_no = models.CharField(max_length=30, unique=True, null=False, blank=False)
     # Address Information
     address = models.CharField(max_length=255, blank=True, null=True)
     address_nepali = models.CharField(max_length=255, blank=True, null=True)
@@ -119,13 +119,19 @@ class KYCModel(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     updated_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.policy_no
+
 
     class Meta:
+        db_table = 'kyc_kycmodel'  
         verbose_name = 'KYC Detail'
         verbose_name_plural = 'KYC Details'
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+    
 
     @property
     def full_name(self):

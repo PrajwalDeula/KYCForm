@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .models import KYCModel
 import random
+from django.contrib import messages
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from .forms import KYCForm
+from .forms import KYCForm, LoginForm
+
 from datetime import datetime, timedelta
 from django.urls import reverse 
 from django.db.models import Q
@@ -17,7 +19,32 @@ from django.views.decorators.csrf import csrf_exempt
 def home(request):
     return HttpResponse("KYC Home Page")
 
+
+def kyc_login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            policy_no = form.cleaned_data["policy_no"]
+            dob = form.cleaned_data["dob"]
+            print("Hello")
+
+         
+            kyc = KYCModel.objects.get(policy_no=policy_no, date_of_birth_ad=dob)
+                # Redirect with kyc_id in URL instead of session
+                
+            request.session["kyc_id"] = kyc.kyc_id
+            request.session.modified = True
+            return redirect("kyc:kyc_create")
+
+    else:
+        form = LoginForm()
+
+    return render(request, "kyc_login.html", {"form": form})
+
+    
+    
 # Create/Submit KYC form
+
 def kyc_create_view(request):
     if request.method == 'POST':
         form = KYCForm(request.POST)
