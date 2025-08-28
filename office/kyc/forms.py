@@ -33,22 +33,10 @@ class KYCForm(forms.ModelForm):
             'required': 'required'
         })
     )
-    
-    policy_no = forms.CharField(  # Add this field definition
-        label="Policy Number",
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Enter Policy Number",
-            "required": "required"
-        })
-    )
 
     class Meta:
         model = KYCModel
-        exclude = ['created_date', 'updated_date'] 
-        fields = '__all__'
+        exclude = ['created_date', 'updated_date']  
         ordering = ['-created_date']
         widgets = {
             'dob_bs': NepaliDateInput(attrs={
@@ -131,11 +119,4 @@ class KYCForm(forms.ModelForm):
         self.fields['national_id_no'].widget.attrs['required'] = 'required'
         self.fields['national_id_no'].error_messages = {
             'required': 'National ID number is required'
-        }
-        
-        # Configure policy_no field
-        self.fields['policy_no'].required = True
-        self.fields['policy_no'].widget.attrs['required'] = 'required'
-        self.fields['policy_no'].error_messages = {
-            'required': 'Policy number is required'
         }

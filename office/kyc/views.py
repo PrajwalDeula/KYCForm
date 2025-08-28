@@ -13,6 +13,9 @@ from django.db.models import Q
 from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+import json
+import requests
+from django.conf import settings
 
 
 # Home page view
@@ -33,6 +36,8 @@ def kyc_login_view(request):
                 
                 # Store kyc_id in session and redirect
                 request.session["kyc_id"] = kyc.kyc_id
+                request.session["policy_no"] = policy_no
+                request.session["dob_ad"] = dob.isoformat()
                 request.session.modified = True
                 return redirect("kyc:kyc_create")
                 
@@ -52,8 +57,109 @@ def kyc_login_view(request):
         form = LoginForm()
 
     return render(request, "kyc_login.html", {"form": form})
+#Create a view (validate-policy) in server side instead of getting already existing database data
 
+
+
+@csrf_exempt
+@require_POST
+def validate_policy(request):
+    """
+    Validate policy number and date of birth against external API
+    """
+    try:
+        # Parse the JSON data from the request body
+        data = json.loads(request.body)
+        policy_no = data.get('policy_no', '').strip()
+        date_of_birth = data.get('date_of_birth', '').strip()
+        
+        # Validate that we have both required fields
+        if not policy_no:
+            return JsonResponse({
+                'valid': False,
+                'message': 'Policy number is required'
+            }, status=400)
+            
+        if not date_of_birth:
+            return JsonResponse({
+                'valid': False,
+                'message': 'Date of birth is required'
+            }, status=400)
+        
+        # Call the external API to validate the policy
+        # Replace with your actual API endpoint and parameters
+        API_URL = "http://127.0.0.1:8001/policies"
+        
+        try:
+            # Make request to external API
+            response = requests.post(
+                API_URL,
+                json={
+                    'policy_number': policy_no,
+                    'date_of_birth': date_of_birth
+                },
+                timeout=10  # Set a timeout to prevent hanging
+            )
+            
+            # Check if the API request was successful
+            if response.status_code == 200:
+                api_data = response.json()
+                
+                # Adjust this based on your API's response structure
+                if api_data.get('is_valid', False):
+                    return JsonResponse({
+                        'valid': True,
+                        'message': 'Credentials verified successfully',
+                        'policy_data': api_data.get('policy_data', {})
+                    })
+                else:
+                    return JsonResponse({
+                        'valid': False,
+                        'message': api_data.get('message', 'Invalid policy number or date of birth')
+                    }, status=404)
+            
+            # Handle API errors
+            elif response.status_code == 404:
+                return JsonResponse({
+                    'valid': False,
+                    'message': 'Policy not found in the system'
+                }, status=404)
+                
+            else:
+                return JsonResponse({
+                    'valid': False,
+                    'message': f'Validation service error: {response.status_code}'
+                }, status=response.status_code)
+                
+        except requests.exceptions.Timeout:
+            return JsonResponse({
+                'valid': False,
+                'message': 'Validation service timeout. Please try again.'
+            }, status=504)
+            
+        except requests.exceptions.ConnectionError:
+            return JsonResponse({
+                'valid': False,
+                'message': 'Cannot connect to validation service. Please try again later.'
+            }, status=503)
+            
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({
+                'valid': False,
+                'message': f'Error connecting to validation service: {str(e)}'
+            }, status=500)
     
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'valid': False,
+            'message': 'Invalid JSON data'
+        }, status=400)
+    
+    except Exception as e:
+        return JsonResponse({
+            'valid': False,
+            'message': 'An internal error occurred during validation'
+        }, status=500)
     
 # Create/Submit KYC form
 

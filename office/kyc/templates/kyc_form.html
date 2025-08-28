@@ -456,7 +456,7 @@
                         </div>
                     </div>
 
-                    <!-- Policy Number -->
+                             <!-- Policy Number -->
 
                     <div class="form-group">
                     <label for="{{ form.policy_no.id_for_label }}">Policy No</label>
@@ -465,6 +465,7 @@
                         <div class="text-danger">{{ form.policy_no.errors }}</div>
                     {% endif %}
                     </div>
+
 
                     <!-- Politically Involved -->
                     <div class="form-group">
@@ -929,7 +930,13 @@
                 field.nextAll('.error-message').remove();
             }
 
-            
+            // House number validation function
+            function isValidHouseNumber(houseNo) {
+                // Only numbers allowed for house number
+                const re = /^\d+$/;
+                return re.test(houseNo);
+            }
+
             
             function isValidEmail(email) {
                 const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1060,7 +1067,6 @@
             $('#id_house_no').on('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
-
             // Only allow numbers for bank account number
             $('#id_bank_ac_no').on('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
@@ -1111,6 +1117,8 @@
 
             // Remove default 0 from house number
             $('#id_house_no').val('');
+
+            
 
             // Form validation
             $('form').submit(function(e) {
@@ -1190,12 +1198,11 @@
                 
                 // House number validation (only numbers)
                 const houseNoField = $('#id_house_no');
-                if (houseNoField.val().trim() && !isValidDocumentNumber(houseNoField.val())) {
+                if (houseNoField.val().trim() && !isValidHouseNumber(houseNoField.val())) {
                     isValid = false;
                     markFieldInvalid(houseNoField, 'Please enter numbers only for house number');
                     if (!firstErrorField) firstErrorField = houseNoField[0];
-                }
-                                    
+}          
                 // PAN number validation (9 digits)
                 const panField = $('#id_pan_no');
                 if (panField.val().trim() && !isValidPAN(panField.val())) {
