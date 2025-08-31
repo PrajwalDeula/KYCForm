@@ -36,7 +36,7 @@ class KYCForm(forms.ModelForm):
 
     class Meta:
         model = KYCModel
-        exclude = ['created_date', 'updated_date']  
+        exclude = ['created_date', 'updated_date', 'status']  
         ordering = ['-created_date']
         widgets = {
             'dob_bs': NepaliDateInput(attrs={

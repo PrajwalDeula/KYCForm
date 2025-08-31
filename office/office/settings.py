@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'nepali_datetime_field',
-    'kyc'
+    'kyc',
     
 ]
 

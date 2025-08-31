@@ -6,6 +6,7 @@ app_name = 'kyc'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('kyc_dashboard/', views.kyc_dashboard_view, name='kyc_dashboard'),
     path('kyc_login/',views.kyc_login_view,name='kyc_login'),
     path('validate-policy/', views.validate_policy, name='validate_policy'),
     path('kyc_login/kyc_form/', views.kyc_create_view, name='kyc_create'),  # add this

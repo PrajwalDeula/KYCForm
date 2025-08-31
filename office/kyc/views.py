@@ -57,8 +57,6 @@ def kyc_login_view(request):
         form = LoginForm()
 
     return render(request, "kyc_login.html", {"form": form})
-#Create a view (validate-policy) in server side instead of getting already existing database data
-
 
 
 @csrf_exempt
@@ -161,24 +159,44 @@ def validate_policy(request):
             'message': 'An internal error occurred during validation'
         }, status=500)
     
-# Create/Submit KYC form
 
+# Create/Submit KYC form
 def kyc_create_view(request):
     if request.method == 'POST':
         form = KYCForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('kyc:kyc_success')
-        else:print(form.errors) 
-         # Use namespaced redirect
+        else:
+            print(form.errors) 
     else:
         form = KYCForm()
     return render(request, 'kyc_form.html', {'form': form})
 
+
 # Success page after form submission
 def kyc_success_view(request):
-   
     return render(request, 'kyc_success.html')
+
+
+#KYC Dashboard 
+def kyc_dashboard_view(request):
+    form = KYCForm()
+    # Fixed: Moved this inside the function
+    kyc_list = KYCModel.objects.all().order_by('-created_date')[:10]
+    
+    context = {
+        'form': form,
+        'kyc_list': kyc_list,
+        'total_kycs': KYCModel.objects.count(),
+        'pending_kycs': KYCModel.objects.filter(status='Pending').count(),
+        'approved_kycs': KYCModel.objects.filter(status='Approved').count(),
+        'rejected_kycs': KYCModel.objects.filter(status='Rejected').count(),
+        'monthly_labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        'monthly_counts': [5, 10, 7, 12, 8, 15],
+    }
+    return render(request, 'kyc_dashboard.html', context)
+
 
 # List all KYC entries
 def kyc_list_view(request):
@@ -264,113 +282,79 @@ def kyc_list_view(request):
 
 # kyc_lists table
 FIELD_MAPPING = {
-    'ClientNo': 'kyc_id',           # Maps 'ClientNo' to 'kyc_id' field
-    'NewClientNo': 'new_client_no', # Add your actual field names
-    'FullName': 'full_name',        # Map to existing fields in KYCModel
+    'ClientNo': 'kyc_id',
+    'NewClientNo': 'new_client_no',
+    'FullName': 'full_name',
     'MobileNo': 'mobile',
     'IsPolicyIssued': 'is_policy_issued',
     'CreatedBy': 'created_by',
     'CreatedDate': 'created_date',
 }
+
 def kyc_lists_view(request):
-    # First, determine if we're using dummy data or real data
-    use_dummy = request.GET.get('dummy', 'false').lower() == 'true'
-    
-    if use_dummy:
-        # Generate dummy data function
-        def generate_dummy_kyc():
-            first_names = ['John', 'Jane', 'Robert', 'Emily', 'Michael', 'Sarah', 'David', 'Lisa']
-            last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis']
-            mobile_prefixes = ['984', '985', '986', '974', '975']
-            
-            for i in range(1, 101):  # Generate 100 dummy records
-                yield {
-                    'kyc_id': i,
-                    'ClientNo': f"CL{1000 + i}",
-                    'NewClientNo': f"NCL{2000 + i}",
-                    'FullName': f"{random.choice(first_names)} {random.choice(last_names)}",
-                    'MobileNo': f"{random.choice(mobile_prefixes)}{random.randint(1000000, 9999999)}",
-                    'IsPolicyIssued': random.choice([True, False]),
-                    'CreatedBy': random.choice(['admin', 'manager', 'agent1', 'agent2']),
-                    'CreatedDate': (datetime.now() - timedelta(days=random.randint(0, 365))).date()
-                }
+    # Get parameters with defaults for real data
+    order_by = request.GET.get('order_by', 'ClientNo')
+    order_dir = request.GET.get('order_dir', 'asc')
+    search_term = request.GET.get('search', '').strip()
+    page_number = request.GET.get('page', 1)
 
-        # Paginate the dummy data
-        dummy_data = list(generate_dummy_kyc())
-        paginator = Paginator(dummy_data, 10)  # 10 items per page
-        page_number = request.GET.get('page', 1)
-        page_obj = paginator.get_page(page_number)
+    # Map the requested field to actual model field
+    actual_field = FIELD_MAPPING.get(order_by, 'kyc_id')  # Default to kyc_id if mapping not found
 
-        context = {
-            'kyc_list': page_obj,
-            'is_paginated': paginator.num_pages > 1,
-            'page_obj': page_obj,
-            'is_dummy_data': True  # Flag for template to show this is dummy data
-        }
-        
-    else:
-        # Get parameters with defaults for real data
-        order_by = request.GET.get('order_by', 'ClientNo')
-        order_dir = request.GET.get('order_dir', 'asc')
-        search_term = request.GET.get('search', '').strip()
-        page_number = request.GET.get('page', 1)
+    # Validate sorting direction
+    order_dir = 'desc' if order_dir == 'desc' else 'asc'
 
-        # Map the requested field to actual model field
-        actual_field = FIELD_MAPPING.get(order_by, 'kyc_id')  # Default to kyc_id if mapping not found
+    # Base queryset
+    kycs = KYCModel.objects.all()
 
-        # Validate sorting direction
-        order_dir = 'desc' if order_dir == 'desc' else 'asc'
+    # Search filter - update to use actual field names
+    if search_term:
+        kycs = kycs.filter(
+            Q(kyc_id__icontains=search_term) |
+            Q(new_client_no__icontains=search_term) |
+            Q(full_name__icontains=search_term) |
+            Q(mobile__icontains=search_term) |
+            Q(created_by__username__icontains=search_term)  # Assuming created_by is a User
+        )
 
-        # Base queryset
-        kycs = KYCModel.objects.all()
+    # Apply sorting with the actual field name
+    order_prefix = '-' if order_dir == 'desc' else ''
+    kycs = kycs.order_by(f'{order_prefix}{actual_field}')
 
-        # Search filter - update to use actual field names
-        if search_term:
-            kycs = kycs.filter(
-                Q(kyc_id__icontains=search_term) |
-                Q(new_client_no__icontains=search_term) |
-                Q(full_name__icontains=search_term) |
-                Q(mobile__icontains=search_term) |
-                Q(created_by__username__icontains=search_term)  # Assuming created_by is a User
-            )
+    # Paginate the results
+    paginator = Paginator(kycs, 20)
+    try:
+        page_obj = paginator.page(page_number)
+    except:
+        page_obj = paginator.page(1)
 
-        # Apply sorting with the actual field name
-        order_prefix = '-' if order_dir == 'desc' else ''
-        kycs = kycs.order_by(f'{order_prefix}{actual_field}')
+    # Preserve query parameters for pagination links
+    query_params = []
+    if search_term:
+        query_params.append(f'search={search_term}')
+    if order_by != 'ClientNo':
+        query_params.append(f'order_by={order_by}')
+    if order_dir != 'asc':
+        query_params.append(f'order_dir={order_dir}')
 
-        # Paginate the results
-        paginator = Paginator(kycs, 20)
-        try:
-            page_obj = paginator.page(page_number)
-        except:
-            page_obj = paginator.page(1)
+    query_string = '&'.join(query_params)
+    if query_string:
+        query_string = f'&{query_string}'
 
-        # Preserve query parameters for pagination links
-        query_params = []
-        if search_term:
-            query_params.append(f'search={search_term}')
-        if order_by != 'ClientNo':
-            query_params.append(f'order_by={order_by}')
-        if order_dir != 'asc':
-            query_params.append(f'order_dir={order_dir}')
-
-        query_string = '&'.join(query_params)
-        if query_string:
-            query_string = f'&{query_string}'
-
-        context = {
-            'kyc_list': page_obj,
-            'order_by': order_by,  # Keep the original order_by for UI
-            'order_dir': order_dir,
-            'search_term': search_term,
-            'is_paginated': page_obj.has_other_pages(),
-            'total_records': paginator.count,
-            'query_string': query_string,
-            'request': request,
-            'is_dummy_data': False
-        }
+    context = {
+        'kyc_list': page_obj,
+        'order_by': order_by,  # Keep the original order_by for UI
+        'order_dir': order_dir,
+        'search_term': search_term,
+        'is_paginated': page_obj.has_other_pages(),
+        'total_records': paginator.count,
+        'query_string': query_string,
+        'request': request,
+        'is_dummy_data': False
+    }
 
     return render(request, 'kyc_lists.html', context)
+
 
 # Create or Update KYC form based on presence of kyc_id
 def kyc_update_view(request, kyc_id):
@@ -379,12 +363,8 @@ def kyc_update_view(request, kyc_id):
     if request.method == 'POST':
         form = KYCForm(request.POST, instance=kyc)
         if form.is_valid():
-           
-                form.save()
-                return redirect('kyc:kyc_list') 
-           
-            
-              
+            form.save()
+            return redirect('kyc:kyc_list') 
         # If form is invalid or save fails, render the form with errors
         return render(request, 'kyc_update.html', {
             'form': form,
@@ -398,11 +378,8 @@ def kyc_update_view(request, kyc_id):
         'kyc': kyc
     })
 
+
 # Delete a KYC entry
-
-
-
-
 def kyc_delete_view(request, kyc_id):
     try:
         # Try both id and kyc_id fields
@@ -413,24 +390,23 @@ def kyc_delete_view(request, kyc_id):
             
         if request.method == 'POST':
             kyc.delete()
-           
             return redirect('kyc:kyc_list')
             
     except Exception as e:
-       
         return redirect('kyc:kyc_list')
     
     # GET request should not reach here if form is POST-only
     return redirect('kyc:kyc_list')
 
+
 # View details of a single KYC record
 def kyc_detail_view(request, kyc_id):
     kyc = get_object_or_404(KYCModel, kyc_id=kyc_id)
     return render(request, 'kyc_detail.html', {'kyc': kyc})
+
+
 @csrf_exempt
 @require_POST
-
-
 def kyc_bulk_delete(request):
     try:
         # Try both POST form data and JSON body

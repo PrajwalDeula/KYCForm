@@ -40,6 +40,12 @@ LOCAL_UNIT_CHOICES = [
 ]
 
 class KYCModel(models.Model):
+
+    STATUS_CHOICES = [
+        ('Pending','Pending'),
+        ('Approved','Approved'),
+        ('Rejected','Rejected'),
+    ]
     
     kyc_id = models.AutoField(primary_key=True)
     
@@ -81,7 +87,7 @@ class KYCModel(models.Model):
     document_issued_date = models.DateField(verbose_name="Document Issued Date (A.D.)")
     issued_place = models.CharField(max_length=100, choices=ISSUED_PLACE_CHOICES, blank=True, null=True)
     birth_place = models.CharField(max_length=50, blank=True, null=True)
-    policy_no = models.CharField(max_length=30, unique=True, null=False, blank=False)
+    policy_no = models.CharField(max_length=30, unique=True, null=False, blank=False, default='N/A')
     # Address Information
     address = models.CharField(max_length=255, blank=True, null=True)
     address_nepali = models.CharField(max_length=255, blank=True, null=True)
@@ -114,6 +120,9 @@ class KYCModel(models.Model):
     is_aml_crime = models.BooleanField(default=False)
     is_family_politically_involved = models.BooleanField(default=False)
     is_family_aml_crime = models.BooleanField(default=False)
+
+    #status
+    status = models.CharField(max_length=10,choices=STATUS_CHOICES,default='Pending')
     
     # System Fields
     created_date = models.DateTimeField(default=timezone.now)
