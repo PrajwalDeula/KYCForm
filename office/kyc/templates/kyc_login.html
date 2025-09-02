@@ -8,7 +8,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
-    /* Your existing CSS remains unchanged */
     body {
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
@@ -79,6 +78,16 @@
     .spinner-border-sm {
       width: 1rem;
       height: 1rem;
+    }
+    .api-status {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      font-size: 0.8rem;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -151,11 +160,56 @@
     </div>
   </div>
 
+  <!-- API Status Indicator (for debugging) -->
+  <div class="api-status d-none" id="apiStatus">
+    API Status: <span id="apiStatusText">Checking...</span>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('loginForm');
       const toastContainer = document.querySelector('.toast-container');
+      const apiStatus = document.getElementById('apiStatus');
+      const apiStatusText = document.getElementById('apiStatusText');
       let isSubmitting = false;
+      
+      // Make API URL configurable - using a template variable would be better in production
+      const EXTERNAL_API_URL = "http://127.0.0.1:8001/policies/";
+      
+      // Check API status on load
+      checkApiStatus();
+      
+      // Function to check if the API is available
+      async function checkApiStatus() {
+        try {
+          const response = await fetch(EXTERNAL_API_URL, {
+            method: 'OPTIONS', // Using OPTIONS to check availability without affecting data
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            apiStatus.classList.remove('d-none');
+            apiStatus.style.backgroundColor = '#d4edda';
+            apiStatusText.textContent = 'Online';
+            apiStatusText.style.color = '#155724';
+          } else {
+            showApiOfflineWarning();
+          }
+        } catch (error) {
+          console.error('API status check failed:', error);
+          showApiOfflineWarning();
+        }
+      }
+      
+      function showApiOfflineWarning() {
+        apiStatus.classList.remove('d-none');
+        apiStatus.style.backgroundColor = '#f8d7da';
+        apiStatusText.textContent = 'Offline - Using fallback validation';
+        apiStatusText.style.color = '#721c24';
+        showToast('Verification service is temporarily unavailable. Using basic validation.', 'warning');
+      }
       
       // Function to show toast notifications
       function showToast(message, type = 'error') {
@@ -282,8 +336,9 @@
             date_of_birth: dobInput.value
           };
 
-          // Use the external API endpoint directly
-          const EXTERNAL_API_URL = "http://127.0.0.1:8001/policies/";
+          // Set a timeout for the API request
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
           // Send validation request to external API
           const response = await fetch(EXTERNAL_API_URL, {
@@ -292,8 +347,11 @@
               'Content-Type': 'application/json',
               'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
-            body: JSON.stringify(loginData)
+            body: JSON.stringify(loginData),
+            signal: controller.signal
           });
+
+          clearTimeout(timeoutId);
 
           if (response.ok) {
             // Login successful - policy exists
@@ -359,7 +417,11 @@
           }
         } catch (error) {
           console.error('Verification error', error);
-          showToast('Error connecting to verification service. Please try again.', 'error');
+          if (error.name === 'AbortError') {
+            showToast('Verification request timed out. Please try again.', 'error');
+          } else {
+            showToast('Error connecting to verification service. Please try again.', 'error');
+          }
         } finally {
           isSubmitting = false;
           submitButton.disabled = false;
